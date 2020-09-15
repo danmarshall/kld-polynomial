@@ -27,6 +27,10 @@ function sign(x) {
  *  @memberof module:kld-polynomial
  */
 class Polynomial {
+    public coefs: number[];
+    public _variable: string;
+    public _s: number;
+
     /**
      *  Polynomial
      *
@@ -104,7 +108,7 @@ class Polynomial {
             y += dy;
         }
 
-        return {y, dy};
+        return { y, dy };
     }
 
     /**
@@ -146,7 +150,7 @@ class Polynomial {
             }
         }
 
-        const isEnoughCorrection = function() {
+        const isEnoughCorrection = function () {
             // stop if correction is too small or if correction is in simple loop
             return (Math.abs(x_correction) <= min_correction_factor * Math.abs(x)) ||
                 (prev_x_ef_correction === (x - x_correction) - x);
@@ -389,19 +393,18 @@ class Polynomial {
 
                 if (i > 0) {
                     if (value === 1) {
-                        value = this._variable;
+                        coefs.push(this._variable);
                     }
                     else {
-                        value += this._variable;
+                        coefs.push(value + this._variable);
                     }
                 }
 
                 if (i > 1) {
-                    value += "^" + i;
+                    coefs.push("^" + i);
                 }
 
                 signs.push(signString);
-                coefs.push(value);
             }
         }
 
@@ -570,7 +573,7 @@ class Polynomial {
         const TOLERANCE = 1e-6;
         const s = new Array(MAX + 1);
         const h = new Array(MAX + 1);
-        let result = {y: 0, dy: 0};
+        let result = { y: 0, dy: 0 };
 
         h[0] = 1.0;
 
@@ -597,7 +600,7 @@ class Polynomial {
      *  @param {number} maxAbsX
      *  @returns {number}
      */
-    zeroErrorEstimate(maxAbsX) {
+    zeroErrorEstimate(maxAbsX?: number) {
         const poly = this;
         const ERRF = 1e-15;
 
@@ -643,7 +646,7 @@ class Polynomial {
         });
 
         let coefSelectionFunc;
-        const find2Max = function(acc, bi, i) {
+        const find2Max = function (acc, bi, i) {
             if (coefSelectionFunc(i)) {
                 if (acc.max < bi) {
                     acc.nearmax = acc.max;
@@ -656,19 +659,19 @@ class Polynomial {
             return acc;
         };
 
-        coefSelectionFunc = function(i) {
+        coefSelectionFunc = function (i) {
             return i < n && a[i] < 0;
         };
 
         // eslint-disable-next-line unicorn/no-fn-reference-in-iterator
-        const max_nearmax_pos = b.reduce(find2Max, {max: 0, nearmax: 0});
+        const max_nearmax_pos = b.reduce(find2Max, { max: 0, nearmax: 0 });
 
-        coefSelectionFunc = function(i) {
+        coefSelectionFunc = function (i) {
             return i < n && ((n % 2 === i % 2) ? a[i] < 0 : a[i] > 0);
         };
 
         // eslint-disable-next-line unicorn/no-fn-reference-in-iterator
-        const max_nearmax_neg = b.reduce(find2Max, {max: 0, nearmax: 0});
+        const max_nearmax_neg = b.reduce(find2Max, { max: 0, nearmax: 0 });
 
         return {
             negX: -2 * max_nearmax_neg.max,
@@ -705,7 +708,7 @@ class Polynomial {
     */
     bounds() {
         const urb = this.boundsUpperRealFujiwara();
-        const rb = {minX: urb.negX, maxX: urb.posX};
+        const rb = { minX: urb.negX, maxX: urb.posX };
 
         if (urb.negX === 0 && urb.posX === 0) {
             return rb;
@@ -815,7 +818,7 @@ class Polynomial {
             }
             acc.prev_a = ai;
             return acc;
-        }, {pos: 0, neg: 0, prev_a: 0});
+        }, { pos: 0, neg: 0, prev_a: 0 });
 
         return {
             maxRealPos: accum.pos,
@@ -1134,7 +1137,7 @@ class Polynomial {
              *  @param {number} x
              *  @returns {number}
              */
-            const f = function(x) {
+            const f = function (x) {
                 return poly.eval(x);
             };
 
@@ -1142,7 +1145,7 @@ class Polynomial {
              *  @param {number} x
              *  @returns {number}
              */
-            const df = function(x) {
+            const df = function (x) {
                 return poly_d.eval(x);
             };
 
